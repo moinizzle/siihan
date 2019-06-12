@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, print_function
+from string import punctuation
 import sys
+import signal
 import genius
 import artists
 import tweepy
 import random
 import os
 import time
-from string import punctuation
+import datetime
 import re
+
 
 KEY = ''
 SECRET = ''
@@ -18,8 +21,21 @@ SECRET_TOKEN = ''
 GENIUS_TOKEN = ''
 
 
-def execute():
+def signal_handler(signum, frame):
+    raise(SystemExit)
 
+
+def time_handler(secs):
+    time = datetime.datetime.fromtimestamp(secs)
+    formatted = time.strftime(
+        '%Mm %Ss'
+        ) if secs > float(
+            60.00) else str(float(format(secs, '.2f'))) + 's'
+    return str(formatted)
+
+
+def execute():
+    signal.signal(signal.SIGINT, signal_handler)
     siihan = Siihan(KEY, SECRET, TOKEN, SECRET_TOKEN)
     account = siihan.validate()
 
@@ -71,8 +87,7 @@ def execute():
 
             else:
                 print("[ERROR] " + error.reason)
-                print("exiting program...")
-                sys.exit(1)
+                raise(SystemExit)
 
         sleep_time = random.uniform(1, 5)
         time.sleep(sleep_time)
@@ -149,4 +164,11 @@ class Siihan():
         return lyrics.split("\n")
 
 if __name__ == "__main__":
-    execute()
+    begin = time.time()
+    try:
+        execute()
+    except (KeyboardInterrupt, SystemExit):
+        finish = time.time() - begin
+        print('\ntime elapsed: ' + time_handler(finish))
+        print('exiting program...')
+        sys.exit(0)
