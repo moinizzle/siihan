@@ -2,7 +2,7 @@
 
 Siihan's favourite lyrics
 
-## Credits to:
+## Credits:
 
 - [Tweepy][tweepy]
 - [GeniusAPI][geniusapi]
